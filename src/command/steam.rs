@@ -24,7 +24,7 @@ pub fn modify_system_if_needed(
     desired_state: &SteamState,
     executable_path: &Path,
 ) -> Result<Option<()>, crate::Error> {
-    let system_state: SteamState = get_system_steam_state(executable_path)?;
+    let system_state: SteamState = get_system_steam_state()?;
     let modify_system_objectives: ModifySystemObjectives = match get_modify_system_objectives(
         desired_state,
         &system_state,
@@ -34,7 +34,6 @@ pub fn modify_system_if_needed(
         Err(e) => return Err(e),
     };
     modify_system(&modify_system_objectives, executable_path).map(|_| Some(()))
-
 }
 
 fn modify_system(
@@ -86,7 +85,7 @@ fn get_modify_system_objectives(
     }
 }
 
-fn get_system_steam_state(executable_path: &Path) -> Result<SteamState, crate::Error> {
+fn get_system_steam_state() -> Result<SteamState, crate::Error> {
     let lp_class_name: CString = CString::new("CUIEngineWin32").unwrap();
     let lp_window_name: CString = CString::new("Steam").unwrap();
     unsafe {

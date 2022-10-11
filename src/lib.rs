@@ -1,23 +1,14 @@
-use std::path::Path;
-
 mod error;
 pub use error::Error;
 
-mod desired_state;
-pub use desired_state::{DesiredState, DesiredSteamState};
-
 mod command;
+pub use command::{DisplayState, DisplayStateSingle, AudioState, SteamState, modify_system_if_needed};
 
-pub struct Executor<'a> {
-    _mmt_path: &'a Path,
-    _nircmd_path: &'a Path,
+trait SystemModifier<T> {
+    fn new(path: std::path::PathBuf) -> Self;
+    fn get_system_state(&self) -> Result<T, crate::Error>;
+    fn set_objectives(&mut self, desired_state: &T, system_state: &T) -> Result<Option<()>, crate::Error>;
+    fn modify_system(&self) -> Result<(), crate::Error>;
 }
 
-impl<'a> Executor<'a> {
-    pub fn execute<S>(&self, _desired_state: DesiredState<S>) -> Result<(), crate::Error>
-    where
-        S: AsRef<str>
-    {
-        unimplemented!()
-    }
-}
+pub struct 
