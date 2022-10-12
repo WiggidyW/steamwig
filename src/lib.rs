@@ -1,36 +1,48 @@
+use std::path::PathBuf;
+
 mod error;
 pub use error::Error;
 
-mod command;
-pub use command::{DisplayState, DisplayStateSingle, AudioState, SteamState, modify_system_if_needed};
+// mod command;
+// pub use command::{DisplayState, DisplayStateSingle, AudioState, SteamState, modify_system_if_needed};
 
-trait SystemModifier<T> {
-    fn new(path: std::path::PathBuf) -> SystemModifier<T>;
-    fn get_system_state(&self) -> Result<T, crate::Error>;
+// pub trait SystemModifier<T> {
+//     fn new(path: std::path::PathBuf) -> Self;
+//     fn get_system_state(&self) -> Result<T, crate::Error>;
+// }
+
+mod display;
+pub use display::DisplayState;
+
+mod display_sys;
+
+mod audio;
+pub use audio::AudioState;
+
+mod audio_sys;
+
+mod steam;
+pub use steam::SteamState;
+
+mod steam_sys;
+
+pub struct SystemModifier<D, A, S> {
+    display_modifier: D,
+    audio_modifier: A,
+    steam_modifier: S,
 }
 
-pub struct AudioState {
-    primary_device_id: String,
-    volume: u8,
-    muted: bool,
-}
-
-trait AudioModifier {
-    fn set_primary_device(&self, primary_device_id: &str) -> Result<(), crate::Error>;
-    fn set_volume(&self, volume: u8) -> Result<(), crate::Error>;
-    fn set_muted(&self, muted: bool) -> Result<(), crate::Error>;
-    //
-}
-
-trait SteamModifier {
-    fn launch_steam(&self) -> Result<(), crate::Error>;
-    fn kill_steam(&self) -> Result<(), crate::Error>;
-    fn enable_big_picture(&self) -> Result<(), crate::Error>;
-    fn disable_big_picture(&self) -> Result<(), crate::Error>;
-}
-
-trait DisplayModifier {
-    fn set_primary_device(&self, primary_device_id: &str) -> Result<(), crate::Error>;
-    fn disable_monitors(&self, device_ids: &[&str]) -> Result<(), crate::Error>;
-    fn enable_monitors(&self, device_ids: &[&str]) -> Result<(), crate::Error>;
+impl<D, A, S> SystemModifier<D, A, S>
+where
+    D: display::DisplayModifier,
+    A: audio::AudioModifier,
+    S: steam::SteamModifier,
+{
+    pub fn new(display_modifier_path: PathBuf, audio_modifier_path: PathBuf, steam_modifier_path: PathBuf) -> Self {
+        SystemModifier {
+            display_modifier: D::new(display_modifier_path),
+            audio_modifier: A::new(audio_modifier_path),
+            steam_modifier: S::new(steam_modifier_path),
+        }
+    }
 }

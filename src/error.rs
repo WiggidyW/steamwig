@@ -6,4 +6,5 @@ pub enum Error {
     PowershellError(powershell_script::PsError),
     MalformedCsvError,
     MalformedPowershellError,
+    ADCParseError(crate::audio_sys::ADCParseError),
 }

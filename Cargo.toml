@@ -10,6 +10,8 @@ csv = { version = "1.1.6" }
 tempfile = { version = "3.3.0" }
 powershell_script = { version = "1.0.4" }
 winapi = { version = "0.3.9", features = ["winuser"] }
+regex = { version = "1.6.0" }
+lazy_static = { version = "1.4.0" }
 
 [build-dependencies]
 zip = { version = "0.6.2", default-features = false, features = ["deflate"] }
