@@ -5,6 +5,24 @@ pub struct AudioState {
     pub (crate) muted: Option<bool>,
 }
 
+impl AudioState {
+    pub fn new() -> AudioState {
+        AudioState {
+            primary_device_id: String::new(),
+            volume: None,
+            muted: None,
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        if self.primary_device_id.is_empty() && self.volume == None && self.muted == None {
+            true
+        } else {
+            false 
+        }
+    }
+}
+
 #[derive(Debug)]
 struct AudioModifierObjectives<'a> {
     primary_device_id: &'a str,
@@ -20,6 +38,9 @@ pub trait AudioModifier {
     fn set_muted(&self, muted: bool) -> Result<(), crate::Error>;
 
     fn check_and_modify(&self, desired_state: &AudioState) -> Result<bool, crate::Error> {
+        if desired_state.is_empty() {
+            return Ok(false)
+        }
         let system_state: AudioState = self.get_system_state()?;
         let objectives: AudioModifierObjectives = match get_objectives(&desired_state, &system_state) {
             Some(o) => o,
@@ -62,15 +83,5 @@ fn get_objectives<'a>(
             volume: volume,
             muted: muted,
         })
-    }
-}
-
-impl AudioState {
-    pub fn new() -> Self {
-        AudioState {
-            primary_device_id: String::new(),
-            volume: None,
-            muted: None,
-        }
     }
 }

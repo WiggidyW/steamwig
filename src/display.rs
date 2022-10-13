@@ -5,6 +5,27 @@ pub struct DisplayState {
     pub (crate) disabled_device_ids: Vec<String>,
 }
 
+impl DisplayState {
+    pub fn new() -> DisplayState {
+        DisplayState {
+            primary_device_id: String::new(),
+            enabled_device_ids: Vec::new(),
+            disabled_device_ids: Vec::new(),
+        }
+    }
+
+    pub fn is_empty(&self) -> bool {
+        if self.primary_device_id.is_empty()
+            && self.enabled_device_ids.is_empty()
+            && self.disabled_device_ids.is_empty()
+        {
+            true
+        } else {
+            false
+        }
+    }
+}
+
 #[derive(Debug)]
 struct DisplayModifierObjectives<'a> {
     primary_device_id: &'a str,
@@ -20,6 +41,9 @@ pub trait DisplayModifier {
     fn set_primary_device(&self, id: &str) -> Result<(), crate::Error>;
 
     fn check_and_modify(&self, desired_state: &DisplayState) -> Result<bool, crate::Error> {
+        if desired_state.is_empty() {
+            return Ok(false)
+        }
         let system_state: DisplayState = self.get_system_state()?;
         let objectives: DisplayModifierObjectives = match get_objectives(&desired_state, &system_state) {
             Some(o) => o,
@@ -66,15 +90,5 @@ fn get_objectives<'a>(
             enabled_device_ids: enabled_device_ids,
             disabled_device_ids: disabled_device_ids,
         }),
-    }
-}
-
-impl DisplayState {
-    pub fn new() -> Self {
-        DisplayState {
-            primary_device_id: String::new(),
-            enabled_device_ids: Vec::new(),
-            disabled_device_ids: Vec::new(),
-        }
     }
 }

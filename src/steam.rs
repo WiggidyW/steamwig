@@ -1,8 +1,23 @@
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub enum SteamState {
+    None,
     NotRunning,
     RunningNormal,
     RunningBigPicture,
+}
+
+impl SteamState {
+    pub fn new() -> SteamState {
+        SteamState::None
+    }
+    
+    pub fn is_empty(&self) -> bool {
+        if self == &SteamState::None {
+            true
+        } else {
+            false
+        }
+    }
 }
 
 pub trait SteamModifier {
@@ -15,6 +30,9 @@ pub trait SteamModifier {
     fn disable_big_picture(&self) -> Result<(), crate::Error>;
 
     fn check_and_modify(&self, desired_state: &SteamState) -> Result<bool, crate::Error> {
+        if desired_state.is_empty() {
+            return Ok(false)
+        }
         let system_state: SteamState = self.get_system_state()?;
         match (&system_state, desired_state) {
             (_, _) if &system_state == desired_state => Ok(false),

@@ -1,64 +1,57 @@
 use crate::display::{DisplayState, DisplayModifier};
 use crate::audio::{AudioState, AudioModifier};
 use crate::steam::{SteamState, SteamModifier};
+use crate::display_sys::MMTModifier;
+use crate::audio_sys::ADCModifier;
+use crate::steam_sys::U32Modifier;
 
+use std::path::PathBuf;
 use std::time;
-use std::thread;
 
-#[derive(Debug, Copy, Clone)]
-pub struct SystemModifier<D, A, S> {
-    pub (crate) display_modifier: D,
-    pub (crate) audio_modifier: A,
-    pub (crate) steam_modifier: S,
-    pub (crate) max_attempts: usize,
-    pub (crate) sleep_interval: time::Duration,
+type InnerSystemModifier = crate::system_modifier_inner::InnerSystemModifier<MMTModifier, ADCModifier, U32Modifier>;
+
+static MMT_PATH: &[&str] = &["assets", "MultiMonitorTool.exe"];
+static ADC_PATH: &[&str] = &["assets", "AudioDeviceCmdlets.dll"];
+
+const DEFAULT_SLEEP_INTERVAL_SECS: u64 = 5;
+const DEFAULT_MAX_ATTEMPTS: usize = 5;
+
+pub struct SystemModifier {
+    inner: InnerSystemModifier,
 }
 
-impl<D, A, S> SystemModifier<D, A, S>
-where
-    D: DisplayModifier,
-    A: AudioModifier,
-    S: SteamModifier,
-{
-    pub fn run(
-        &self,
-        desired_display_state: Option<&DisplayState>,
-        desired_audio_state: Option<&AudioState>,
-        desired_steam_state: Option<&SteamState>,
-    ) -> Result<bool, crate::Error> {
-        for _ in 0..self.max_attempts {
-            let continue_run: bool = self.check_and_modify(
-                desired_display_state,
-                desired_audio_state,
-                desired_steam_state,
-            )?;
-            if !continue_run { return Ok(true) }
-            thread::sleep(self.sleep_interval);
-        }
-        Ok(false)
+impl SystemModifier {
+    pub fn new(steam_exe_path: PathBuf) -> SystemModifier {
+        SystemModifier { inner: InnerSystemModifier {
+            display_modifier: MMTModifier::new(MMT_PATH.iter().collect()),
+            audio_modifier: ADCModifier::new(ADC_PATH.iter().collect()),
+            steam_modifier: U32Modifier::new(steam_exe_path),
+            max_attempts: DEFAULT_MAX_ATTEMPTS,
+            sleep_interval: time::Duration::from_secs(DEFAULT_SLEEP_INTERVAL_SECS),
+        }}
     }
 
-    fn check_and_modify(
-        &self,
-        desired_display_state: Option<&DisplayState>,
-        desired_audio_state: Option<&AudioState>,
-        desired_steam_state: Option<&SteamState>,
-    ) -> Result<bool, crate::Error> {
-        let display_result = match desired_display_state {
-            Some(d) => self.display_modifier.check_and_modify(d)?,
-            None => false,
-        };
-        let audio_result = match desired_audio_state {
-            Some(a) => self.audio_modifier.check_and_modify(a)?,
-            None => false,
-        };
-        let steam_result = match desired_steam_state {
-            Some(s) => self.steam_modifier.check_and_modify(s)?,
-            None => false,
-        };
-        match (display_result, audio_result, steam_result) {
-            (false, false, false) => Ok(false),
-            _ => Ok(true),
-        }
+    pub fn with_mmt_path(&mut self, path: PathBuf) {
+        self.inner.display_modifier.exe_path = path
+    }
+
+    pub fn with_adc_path(&mut self, path: PathBuf) {
+        self.inner.audio_modifier.module_path = path
+    }
+
+    pub fn with_steam_path(&mut self, path: PathBuf) {
+        self.inner.steam_modifier.exe_path = path
+    }
+
+    pub fn with_max_attempts(&mut self, max_attempts: usize) {
+        self.inner.max_attempts = max_attempts
+    }
+
+    pub fn with_sleep_interval(&mut self, sleep_interval: time::Duration) {
+        self.inner.sleep_interval = sleep_interval
+    }
+
+    pub fn finalize(self) -> SystemModifier {
+        self
     }
 }

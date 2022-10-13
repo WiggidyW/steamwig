@@ -1,4 +1,5 @@
 use crate::display::{DisplayState, DisplayModifier};
+use crate::error::MMTParseError;
 
 use std::path::{Path, PathBuf};
 use std::fs::File;
@@ -10,13 +11,6 @@ use csv;
 #[derive(Debug)]
 pub struct MMTModifier {
     pub (crate) exe_path: PathBuf,
-}
-
-#[derive(Debug)]
-pub struct MMTParseError {
-    output: csv::StringRecord,
-    index: usize,
-    description: &'static str,
 }
 
 #[derive(Debug)]

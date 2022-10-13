@@ -1,4 +1,5 @@
 use crate::audio::{AudioState, AudioModifier};
+use crate::error::ADCParseError;
 
 use std::path::{Path, PathBuf};
 use std::process;
@@ -10,12 +11,6 @@ use regex::Regex;
 #[derive(Debug)]
 pub struct ADCModifier {
     pub (crate) module_path: PathBuf,
-}
-
-#[derive(Debug)]
-pub struct ADCParseError {
-    output: Vec<u8>,
-    description: &'static str,
 }
 
 impl AudioModifier for ADCModifier {
