@@ -7,15 +7,18 @@ use lazy_static::lazy_static;
 use powershell_script;
 use regex::Regex;
 
+#[derive(Debug)]
 pub struct ADCModifier {
-    module_path: PathBuf,
+    pub (crate) module_path: PathBuf,
+}
+
+#[derive(Debug)]
+pub struct ADCParseError {
+    output: Vec<u8>,
+    description: &'static str,
 }
 
 impl AudioModifier for ADCModifier {
-    fn new(path: std::path::PathBuf) -> Self {
-        ADCModifier { module_path: path }
-    }
-
     fn get_system_state(&self) -> Result<AudioState, crate::Error> {
         Ok(AudioState {
             primary_device_id: get_primary_device(&self.module_path)?,
@@ -24,8 +27,8 @@ impl AudioModifier for ADCModifier {
         })
     }
 
-    fn set_primary_device(&self, primary_device_id: &str) -> Result<(), crate::Error> {
-        set_primary_device(&self.module_path, primary_device_id)
+    fn set_primary_device(&self, id: &str) -> Result<(), crate::Error> {
+        set_primary_device(&self.module_path, id)
     }
 
     fn set_volume(&self, volume: u8) -> Result<(), crate::Error> {
@@ -37,16 +40,17 @@ impl AudioModifier for ADCModifier {
     }
 }
 
-pub struct ADCParseError {
-    output: Vec<u8>,
-    description: &'static str,
+impl ADCModifier {
+    pub fn new(module_path: std::path::PathBuf) -> Self {
+        ADCModifier { module_path: module_path }
+    }
 }
 
-fn powershell_run(module_path: &Path, commands: &[&str]) -> Result<process::Output, crate::Error> {
+fn powershell_run(module_path: &Path, args: &[&str]) -> Result<process::Output, crate::Error> {
     let mut script: String = format!("Import-Module {};", module_path.to_string_lossy());
-    for command in commands {
+    for arg in args {
         script.push(' ');
-        script.push_str(command);
+        script.push_str(arg);
     }
     match powershell_script::run(&script) {
         Ok(output) => Ok(output.into_inner()),

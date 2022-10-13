@@ -152,7 +152,7 @@ mod mmt_commands {
         monitor_id: &str,
     ) -> Result<process::Output, crate::Error> {
         process::Command::new(executable_path).stdin(process::Stdio::null())
-            .arg("SetPrimary")
+            .arg("/SetPrimary")
             .arg(monitor_id)
             .output()
             .map_err(|e| crate::Error::CommandError(e))

@@ -13,11 +13,9 @@ struct AudioModifierObjectives<'a> {
 }
 
 pub trait AudioModifier {
-    fn new(path: std::path::PathBuf) -> Self;
-
     fn get_system_state(&self) -> Result<AudioState, crate::Error>;
 
-    fn set_primary_device(&self, primary_device_id: &str) -> Result<(), crate::Error>;
+    fn set_primary_device(&self, id: &str) -> Result<(), crate::Error>;
     fn set_volume(&self, volume: u8) -> Result<(), crate::Error>;
     fn set_muted(&self, muted: bool) -> Result<(), crate::Error>;
 

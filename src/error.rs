@@ -1,10 +1,9 @@
+#[derive(Debug)]
 pub enum Error {
-    Unimplemented,
-    TempDirError(std::io::Error),
-    CommandError(std::io::Error),
-    CsvError(csv::Error),
-    PowershellError(powershell_script::PsError),
-    MalformedCsvError,
-    MalformedPowershellError,
+    MMTParseError(crate::display_sys::MMTParseError),
     ADCParseError(crate::audio_sys::ADCParseError),
+    PowershellError(powershell_script::PsError),
+    CommandError(std::io::Error),
+    TempDirError(std::io::Error),
+    CsvError(csv::Error),
 }

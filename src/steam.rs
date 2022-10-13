@@ -6,8 +6,6 @@ pub enum SteamState {
 }
 
 pub trait SteamModifier {
-    fn new(path: std::path::PathBuf) -> Self;
-
     fn get_system_state(&self) -> Result<SteamState, crate::Error>;
 
     fn kill_steam(&self) -> Result<(), crate::Error>;

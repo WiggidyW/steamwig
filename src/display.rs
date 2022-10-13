@@ -1,8 +1,8 @@
 #[derive(Debug, Clone, PartialEq)]
 pub struct DisplayState {
-    primary_device_id: String,
-    enabled_device_ids: Vec<String>,
-    disabled_device_ids: Vec<String>,
+    pub (crate) primary_device_id: String,
+    pub (crate) enabled_device_ids: Vec<String>,
+    pub (crate) disabled_device_ids: Vec<String>,
 }
 
 #[derive(Debug)]
@@ -13,13 +13,11 @@ struct DisplayModifierObjectives<'a> {
 }
 
 pub trait DisplayModifier {
-    fn new(path: std::path::PathBuf) -> Self;
-
     fn get_system_state(&self) -> Result<DisplayState, crate::Error>;
 
-    fn set_primary_device(&self, primary_device_id: &str) -> Result<(), crate::Error>;
-    fn disable_monitors(&self, device_ids: &[&str]) -> Result<(), crate::Error>;
     fn enable_monitors(&self, device_ids: &[&str]) -> Result<(), crate::Error>;
+    fn disable_monitors(&self, device_ids: &[&str]) -> Result<(), crate::Error>;
+    fn set_primary_device(&self, id: &str) -> Result<(), crate::Error>;
 
     fn check_and_modify(&self, desired_state: &DisplayState) -> Result<bool, crate::Error> {
         let system_state: DisplayState = self.get_system_state()?;
