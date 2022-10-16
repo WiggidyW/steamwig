@@ -1,14 +1,12 @@
-use crate::display::{DisplayState, DisplayModifier};
-use crate::audio::{AudioState, AudioModifier};
-use crate::steam::{SteamState, SteamModifier};
-use crate::display_sys::MMTModifier;
-use crate::audio_sys::ADCModifier;
-use crate::steam_sys::U32Modifier;
+use super::display_sys::MMTModifier;
+use super::audio_sys::ADCModifier;
+use super::steam_sys::U32Modifier;
+use super::task::Task;
 
 use std::path::PathBuf;
 use std::time;
 
-type InnerSystemModifier = crate::system_modifier_inner::InnerSystemModifier<MMTModifier, ADCModifier, U32Modifier>;
+type InnerSystemModifier = super::system_modifier_inner::InnerSystemModifier<MMTModifier, ADCModifier, U32Modifier>;
 
 static MMT_PATH: &[&str] = &["assets", "MultiMonitorTool.exe"];
 static ADC_PATH: &[&str] = &["assets", "AudioDeviceCmdlets.dll"];
@@ -20,7 +18,20 @@ pub struct SystemModifier {
     inner: InnerSystemModifier,
 }
 
+#[allow(dead_code)]
 impl SystemModifier {
+    pub fn run(&self, task: &Task) -> Result<bool, crate::Error> {
+        self.inner.run(task)
+    }
+
+    pub fn display_id_readout(&self) -> Result<String, crate::Error> {
+        self.inner.display_id_readout()
+    }
+
+    pub fn audio_id_readout(&self) -> Result<String, crate::Error> {
+        self.inner.audio_id_readout()
+    }
+    
     pub fn new(steam_exe_path: PathBuf) -> SystemModifier {
         SystemModifier { inner: InnerSystemModifier {
             display_modifier: MMTModifier::new(MMT_PATH.iter().collect()),

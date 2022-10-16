@@ -31,6 +31,8 @@ struct AudioModifierObjectives<'a> {
 }
 
 pub trait AudioModifier {
+    fn get_id_readout(&self) -> Result<String, crate::Error>;
+
     fn get_system_state(&self) -> Result<AudioState, crate::Error>;
 
     fn set_primary_device(&self, id: &str) -> Result<(), crate::Error>;

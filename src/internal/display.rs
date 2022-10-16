@@ -34,6 +34,8 @@ struct DisplayModifierObjectives<'a> {
 }
 
 pub trait DisplayModifier {
+    fn get_id_readout(&self) -> Result<String, crate::Error>;
+
     fn get_system_state(&self) -> Result<DisplayState, crate::Error>;
 
     fn enable_monitors(&self, device_ids: &[&str]) -> Result<(), crate::Error>;

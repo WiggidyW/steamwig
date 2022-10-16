@@ -12,6 +12,7 @@ powershell_script = { version = "1.0.4" }
 winapi = { version = "0.3.9", features = ["winuser"] }
 regex = { version = "1.6.0" }
 lazy_static = { version = "1.4.0" }
+clap = { version = "4.0.15", features = ["derive"] }
 
 [build-dependencies]
 zip = { version = "0.6.2", default-features = false, features = ["deflate"] }

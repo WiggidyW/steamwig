@@ -1,4 +1,4 @@
-use crate::display::{DisplayState, DisplayModifier};
+use super::display::{DisplayState, DisplayModifier};
 use crate::error::MMTParseError;
 
 use std::path::{Path, PathBuf};
@@ -21,6 +21,10 @@ struct ParsedRecord {
 }
 
 impl DisplayModifier for MMTModifier {
+    fn get_id_readout(&self) -> Result<String, crate::Error> {
+        unimplemented!()
+    }
+
     fn get_system_state(&self) -> Result<DisplayState, crate::Error> {
         get_system_state(&self.exe_path)
     }

@@ -1,8 +1,6 @@
-use crate::display::DisplayState;
-use crate::audio::AudioState;
-use crate::steam::SteamState;
-
-// use std::iter::Iterator;
+use super::display::DisplayState;
+use super::audio::AudioState;
+use super::steam::SteamState;
 
 #[derive(Debug, Clone, PartialEq)]
 pub struct Task {
@@ -11,6 +9,7 @@ pub struct Task {
     pub (crate) steam_state: SteamState,
 }
 
+#[allow(dead_code)]
 impl Task {
     pub fn new() -> Task {
         Task {
@@ -28,7 +27,7 @@ impl Task {
         self.display_state.enabled_device_ids.push(id)
     }
 
-    pub fn enable_displays(&mut self, ids: impl Iterator<Item = String>) {
+    pub fn enable_displays(&mut self, ids: Vec<String>) {
         for id in ids {
             self.display_state.enabled_device_ids.push(id)
         }
@@ -38,7 +37,7 @@ impl Task {
         self.display_state.disabled_device_ids.push(id)
     }
 
-    pub fn disable_displays(&mut self, ids: impl Iterator<Item = String>) {
+    pub fn disable_displays(&mut self, ids: Vec<String>) {
         for id in ids {
             self.display_state.disabled_device_ids.push(id)
         }

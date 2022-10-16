@@ -7,8 +7,7 @@ use zip;
 
 const MMT: &str = "multimonitortool.zip";
 const MMT_X64: &str = "multimonitortool-x64.zip";
-const NIRCMD: &str = "nircmd.zip";
-const NIRCMD_X64: &str = "nircmd-x64.zip";
+const ADC: &str = "AudioDeviceCmdlets.dll";
 
 fn unzip(zip_path: &Path, output_path: &Path) {
     let file: fs::File = fs::File::open(zip_path).unwrap();
@@ -32,17 +31,19 @@ fn main() {
     let asset_path: PathBuf = root_path.join("assets");
     let output_path: PathBuf = root_path.join("target")
         .join(env::var("PROFILE").unwrap())
-        .join("deps");
+        .join("assets");
+
+    std::fs::create_dir_all(&output_path).unwrap();
 
     match &env::var("CARGO_CFG_TARGET_ARCH").unwrap()[..] {
         "x86" => {
             unzip(&asset_path.join(MMT), &output_path);
-            unzip(&asset_path.join(NIRCMD), &output_path);
         },
         "x86_64" => {
             unzip(&asset_path.join(MMT_X64), &output_path);
-            unzip(&asset_path.join(NIRCMD_X64), &output_path);
         },
-        _ => panic!("steamwig only support x86 and x86_64 architecture build targets"),
+        _ => panic!("steamwig only supports i686 and x86_64 architecture build targets"),
     }
+
+    fs::copy(&asset_path.join(ADC), &output_path.join(ADC)).unwrap();
 }

@@ -1,4 +1,4 @@
-use crate::steam::{SteamState, SteamModifier};
+use super::steam::{SteamState, SteamModifier};
 
 use std::path::{Path, PathBuf};
 use std::ffi::CString;

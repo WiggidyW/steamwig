@@ -1,4 +1,4 @@
-use crate::audio::{AudioState, AudioModifier};
+use super::audio::{AudioState, AudioModifier};
 use crate::error::ADCParseError;
 
 use std::path::{Path, PathBuf};
@@ -14,6 +14,10 @@ pub struct ADCModifier {
 }
 
 impl AudioModifier for ADCModifier {
+    fn get_id_readout(&self) -> Result<String, crate::Error> {
+        unimplemented!()
+    }
+
     fn get_system_state(&self) -> Result<AudioState, crate::Error> {
         Ok(AudioState {
             primary_device_id: get_primary_device(&self.module_path)?,
@@ -64,7 +68,7 @@ fn get_primary_device(module_path: &Path) -> Result<String, crate::Error> {
     match RE.find(stdout_str).map(|m| m.as_str()) {
         Some(device_id) => Ok(device_id.to_string()),
         _ => Err(crate::Error::ADCParseError(ADCParseError {
-            output: output.stdout,
+            output: String::from_utf8_lossy(&output.stdout).to_string(),
             description: "should contain a device ID string 55 characters long",
         })),
     }
@@ -79,7 +83,7 @@ fn get_volume(module_path: &Path) -> Result<u8, crate::Error> {
     match RE.find(stdout_str).map(|m| m.as_str().parse::<u8>()) {
         Some(Ok(volume)) => Ok(volume),
         _ => Err(crate::Error::ADCParseError(ADCParseError {
-            output: output.stdout,
+            output: String::from_utf8_lossy(&output.stdout).to_string(),
             description: "should contain an integer from 0 to 100",
         })),
     }
@@ -95,7 +99,7 @@ fn get_muted(module_path: &Path) -> Result<bool, crate::Error> {
         Some("True") => Ok(true),
         Some("False") => Ok(false),
         _ => Err(crate::Error::ADCParseError(ADCParseError {
-            output: output.stdout,
+            output: String::from_utf8_lossy(&output.stdout).to_string(),
             description: "should contain 'True' or 'False'",
         })),
     }
