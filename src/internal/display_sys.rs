@@ -71,7 +71,7 @@ fn parse_csv_record(record: csv::StringRecord) -> Result<ParsedRecord, crate::Er
             description: "should contain either Yes or No",
         })),
     };
-    let id: String = match record.get(17) {
+    let id: String = match record.get(14) {
         Some(s) => s.to_string(),
         None => return Err(crate::Error::MMTParseError(MMTParseError {
             output: record,

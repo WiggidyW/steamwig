@@ -74,13 +74,13 @@ fn get_objectives<'a>(
     };
     let mut enabled_device_ids: Vec<&str> = Vec::with_capacity(desired_state.enabled_device_ids.len());
     for device_id in &desired_state.enabled_device_ids {
-        if system_state.enabled_device_ids.contains(device_id) {
+        if system_state.disabled_device_ids.contains(device_id) {
             enabled_device_ids.push(device_id);
         }
     }
     let mut disabled_device_ids: Vec<&str> = Vec::with_capacity(desired_state.disabled_device_ids.len());
     for device_id in &desired_state.disabled_device_ids {
-        if system_state.disabled_device_ids.contains(device_id) {
+        if system_state.enabled_device_ids.contains(device_id) {
             disabled_device_ids.push(device_id);
         }
     }
